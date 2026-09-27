@@ -53,7 +53,18 @@ jobs:
             git commit -m "style: apply canonical Rust formatting"
             git push
           }
-      - run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
+      - name: Run native lints
+        shell: pwsh
+        run: |
+          cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings 2>&1 | Tee-Object native-ci.txt
+          if ($LASTEXITCODE -ne 0) {
+            if ('${{ github.event_name }}' -eq 'push') {
+              git add native-ci.txt
+              git commit -m "ci: capture native compiler diagnostics"
+              git push
+            }
+            exit 1
+          }
       - run: cargo test --manifest-path src-tauri/Cargo.toml
 
   windows-package-check:
