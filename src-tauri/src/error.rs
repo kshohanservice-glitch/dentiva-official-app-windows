@@ -29,7 +29,9 @@ pub struct ErrorPayload {
 
 impl Serialize for AppError {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where S: serde::Serializer {
+    where
+        S: serde::Serializer,
+    {
         let code = match self {
             Self::Validation(_) => "VALIDATION",
             Self::Unauthenticated => "UNAUTHENTICATED",
@@ -38,7 +40,11 @@ impl Serialize for AppError {
             Self::Conflict => "CONFLICT",
             Self::Database(_) | Self::Io(_) | Self::Internal => "INTERNAL",
         };
-        ErrorPayload { code, message: self.to_string() }.serialize(serializer)
+        ErrorPayload {
+            code,
+            message: self.to_string(),
+        }
+        .serialize(serializer)
     }
 }
 
