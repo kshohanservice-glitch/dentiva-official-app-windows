@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+*.log
+.env
+.env.*
+!.env.example
+src-tauri/target/
+.DS_Store
+Thumbs.db
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.dpb
