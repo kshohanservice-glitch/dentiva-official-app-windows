@@ -6,7 +6,7 @@ on:
     branches: [main, arena/01a0e432-dentiva-official-app-windows]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   frontend:
@@ -42,10 +42,17 @@ jobs:
         with:
           workspaces: src-tauri
       - run: cargo fmt --manifest-path src-tauri/Cargo.toml
-      - uses: actions/upload-artifact@v4
-        with:
-          name: rustfmt-output
-          path: src-tauri/src
+      - name: Bootstrap canonical Rust formatting
+        if: github.event_name == 'push'
+        shell: pwsh
+        run: |
+          if (git status --porcelain) {
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add src-tauri
+            git commit -m "style: apply canonical Rust formatting"
+            git push
+          }
       - run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
       - run: cargo test --manifest-path src-tauri/Cargo.toml
 
